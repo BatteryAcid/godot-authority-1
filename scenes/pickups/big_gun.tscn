@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://cdt0a6va201af"]
+
+[ext_resource type="Script" uid="uid://cvnkflemde1p2" path="res://scripts/components/pickups/big_gun.gd" id="1_mr1b6"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mr1b6"]
+radius = 100.0
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_mr1b6"]
+size = Vector2(100, 100)
+
+[node name="BigGun" type="Area2D"]
+script = ExtResource("1_mr1b6")
+metadata/_custom_type_script = "uid://fogj64q77vte"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_mr1b6")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("PlaceholderTexture2D_mr1b6")

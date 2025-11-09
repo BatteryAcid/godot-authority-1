@@ -140,4 +140,7 @@ player2_score = NodePath("../GameMenu/Panel/Player2Score")
 play_again_button = NodePath("../GameMenu/Panel/PlayAgain")
 metadata/_custom_type_script = "uid://qpijsveyphtf"
 
+[node name="Pickups" type="Node2D" parent="."]
+unique_name_in_owner = true
+
 [connection signal="pressed" from="GameMenu/Panel/HBoxContainer/MainMenu" to="." method="_on_main_menu_pressed"]

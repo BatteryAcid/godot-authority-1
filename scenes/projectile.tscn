@@ -27,8 +27,9 @@ projectile_sprite = NodePath("AnimatedSprite2D")
 replication_config = SubResource("SceneReplicationConfig_q3m7n")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(7, 0)
+scale = Vector2(0.5, 0.5)
 sprite_frames = ExtResource("2_q3m7n")
-animation = &"explode"
 autoplay = "default"
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
@@ -39,4 +40,5 @@ metadata/_custom_type_script = "uid://s5sn2tc115ng"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxComponent"]
 rotation = 1.5708
+scale = Vector2(0.5, 0.5)
 shape = SubResource("CapsuleShape2D_q3m7n")

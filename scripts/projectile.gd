@@ -1,7 +1,7 @@
 extends Node2D
 
 @export var projectile_sprite: AnimatedSprite2D
-@export var speed: float = 600.0
+@export var speed: float = 700.0
 
 @onready var _visible_on_screen_notifier_2d: VisibleOnScreenNotifier2D = $VisibleOnScreenNotifier2D
 @onready var _hitbox_component: HitboxComponent = $HitboxComponent
