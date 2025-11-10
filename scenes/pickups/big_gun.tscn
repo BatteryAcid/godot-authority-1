@@ -1,19 +1,147 @@
-[gd_scene load_steps=4 format=3 uid="uid://cdt0a6va201af"]
+[gd_scene load_steps=22 format=3 uid="uid://cdt0a6va201af"]
 
 [ext_resource type="Script" uid="uid://cvnkflemde1p2" path="res://scripts/components/pickups/big_gun.gd" id="1_mr1b6"]
+[ext_resource type="Texture2D" uid="uid://bfhbyt0kjw8pd" path="res://assets/mine-armed.png" id="2_n1dql"]
+[ext_resource type="Texture2D" uid="uid://c30ounhh6cv3e" path="res://assets/mine.png" id="2_p2lre"]
+[ext_resource type="Script" uid="uid://s5sn2tc115ng" path="res://scripts/components/hitbox_component.gd" id="2_rc1n5"]
+[ext_resource type="Script" uid="uid://c78tb54fwjdtx" path="res://scripts/components/player_tagged.gd" id="3_aoyl5"]
+[ext_resource type="Texture2D" uid="uid://b87lwi1o5w4q2" path="res://assets/explosion-sheet.png" id="4_nw0x5"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_mr1b6"]
-radius = 100.0
+radius = 77.41
 
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_mr1b6"]
-size = Vector2(100, 100)
+[sub_resource type="AtlasTexture" id="AtlasTexture_cncot"]
+atlas = ExtResource("2_n1dql")
+region = Rect2(0, 0, 180, 103)
 
-[node name="BigGun" type="Area2D"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_8qxe4"]
+atlas = ExtResource("2_n1dql")
+region = Rect2(180, 0, 180, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ag2mt"]
+atlas = ExtResource("2_n1dql")
+region = Rect2(360, 0, 180, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3ia1n"]
+atlas = ExtResource("2_n1dql")
+region = Rect2(540, 0, 180, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_m45xq"]
+atlas = ExtResource("2_n1dql")
+region = Rect2(720, 0, 180, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_osa05"]
+atlas = ExtResource("4_nw0x5")
+region = Rect2(0, 0, 400, 300)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e8fhb"]
+atlas = ExtResource("4_nw0x5")
+region = Rect2(400, 0, 400, 300)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3t3q4"]
+atlas = ExtResource("4_nw0x5")
+region = Rect2(800, 0, 400, 300)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1b3fc"]
+atlas = ExtResource("4_nw0x5")
+region = Rect2(1200, 0, 400, 300)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_x20dq"]
+atlas = ExtResource("4_nw0x5")
+region = Rect2(1600, 0, 400, 300)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eyfpq"]
+atlas = ExtResource("4_nw0x5")
+region = Rect2(2000, 0, 400, 300)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_whkwc"]
+atlas = ExtResource("4_nw0x5")
+region = Rect2(2400, 0, 400, 300)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_nk2jc"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cncot")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8qxe4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ag2mt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3ia1n")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_m45xq")
+}],
+"loop": true,
+"name": &"armed",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_p2lre")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_osa05")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e8fhb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3t3q4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1b3fc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x20dq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eyfpq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_whkwc")
+}],
+"loop": false,
+"name": &"explode",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_aoyl5"]
+radius = 70.0
+
+[node name="BigGun" type="Area2D" node_paths=PackedStringArray("player_tagged", "pickup_sprite")]
 script = ExtResource("1_mr1b6")
+player_tagged = NodePath("PlayerTagged")
+pickup_sprite = NodePath("AnimatedSprite2D")
 metadata/_custom_type_script = "uid://fogj64q77vte"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollectCollisionShape" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_mr1b6")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-texture = SubResource("PlaceholderTexture2D_mr1b6")
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_nk2jc")
+animation = &"armed"
+autoplay = "default"
+
+[node name="HitboxComponent" type="Area2D" parent="." node_paths=PackedStringArray("player_tagged")]
+script = ExtResource("2_rc1n5")
+damage = 5
+player_tagged = NodePath("../PlayerTagged")
+metadata/_custom_type_script = "uid://s5sn2tc115ng"
+
+[node name="HitboxCollision" type="CollisionShape2D" parent="HitboxComponent"]
+shape = SubResource("CircleShape2D_aoyl5")
+debug_color = Color(0.84395075, 0.37422034, 0.17932352, 0.41960785)
+
+[node name="PlayerTagged" type="Node" parent="."]
+script = ExtResource("3_aoyl5")
+metadata/_custom_type_script = "uid://c78tb54fwjdtx"
