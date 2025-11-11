@@ -2,14 +2,13 @@ class_name Projectile
 extends Node2D
 
 @export var projectile_sprite: AnimatedSprite2D
-@export var speed: float = 400.0
+@export var speed: float = 700.0
 @export var player_tagged: PlayerTagged
 
 @onready var _visible_on_screen_notifier_2d: VisibleOnScreenNotifier2D = $VisibleOnScreenNotifier2D
 @onready var _hitbox_component: HitboxComponent = $HitboxComponent
 
 var flip_dir: int = 1
-#var fired_by_name: String
 
 func _ready() -> void:
 	if flip_dir > 0:

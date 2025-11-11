@@ -1,7 +1,13 @@
 extends Node
 
-@onready var pickup_spawn_path: Node2D = get_tree().current_scene.get_node("%Pickups")
-var pickup_item_scene: PackedScene = load("res://scenes/pickups/big_gun.tscn") 
+# LIMITATIONS:
+# - for demo purposes, only the authority can spawn items. For actual gameplay,
+# you'd want to randomly spawn them from a timer or something.
+
+@onready var _pickup_spawn_path: Node2D = get_tree().current_scene.get_node("%Pickups")
+#var _pickup_item_scene: PackedScene = load("res://scenes/pickups/mine.tscn") 
+var _pickup_item_scene_names: Array[String] = ["res://scenes/pickups/mine.tscn", "res://scenes/pickups/side_kick.tscn"]
+
 # TODO: refactor to handle more than one...
 # TODO: convert to list of items
 
@@ -9,20 +15,23 @@ var _pickup_item: PickupComponent = null
 
 func _ready() -> void:
 	var spawner: MultiplayerSpawner = get_child(0)
-	spawner.spawn_path = pickup_spawn_path.get_path()
+	spawner.spawn_path = _pickup_spawn_path.get_path()
 
 # TODO: add keybind support for the different scenarios, probably move towards numbers
 func _physics_process(_delta: float) -> void:
-	if get_tree().get_multiplayer().has_multiplayer_peer() and is_multiplayer_authority() and not MatchManager.game_paused:
-		if Input.is_action_just_pressed("1") and _pickup_item == null:
-			_spawn_pickup_item()
+	if get_tree().get_multiplayer().has_multiplayer_peer() and is_multiplayer_authority() and not MatchManager.game_paused and _pickup_item == null:
+		if Input.is_action_just_pressed("1"):
+			_spawn_pickup_item(0)
+		elif Input.is_action_just_pressed("2"):
+			_spawn_pickup_item(1)
 
-func _spawn_pickup_item():
-	var pickup_to_add = pickup_item_scene.instantiate()
+func _spawn_pickup_item(item_scene_index: int):
+	var pickup_scene = load(_pickup_item_scene_names[item_scene_index])
+	var pickup_to_add = pickup_scene.instantiate()
 	pickup_to_add.set_multiplayer_authority(1)
 	pickup_to_add.global_transform = Transform2D(0, Vector2(randi_range(500, 1300), randi_range(200, 800)))
 	
-	pickup_spawn_path.add_child(pickup_to_add, true)
+	_pickup_spawn_path.add_child(pickup_to_add, true)
 	_pickup_item = pickup_to_add
 	
 	# RPC to synch spawn location on spawn, so we don't have to use a synchronizer
@@ -30,4 +39,4 @@ func _spawn_pickup_item():
 	
 	# kill after some time
 	# TODO: could move to store this in the item itself
-	_pickup_item.set_lifetime(10)
+	_pickup_item.set_lifetime(12)
