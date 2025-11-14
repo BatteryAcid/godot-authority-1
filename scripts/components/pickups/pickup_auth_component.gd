@@ -1,18 +1,14 @@
 class_name PickupAuthComponent
 extends PickupComponent
 
+# TODO: rename this to PickupInputAuthComponent - this designates we only give authority over the inputs
+# - will need another example where we give FULL authority (PickupFullAuthComponent)over the object. Not sure that's possible
+# given that it was spawned by the authority...
+
 @export var input_controller: Node
 
-# Make sure this is only called on authority, this is where we'll process the collision detection
-func _picked_up(collector: Area2D):	
-	if not is_multiplayer_authority() or not collector is CollectorComponent: return
-	
-	if player_tagged.tagged_player_name == "":
-		print("(Auth) Item picked up by %s!" % collector.get_parent().name)
-		player_tagged.tagged_player_name = collector.get_parent().name
-		inform_peers_control_taken.rpc(player_tagged.tagged_player_name) # Use RPC to sync the player that is tagged with picking up the item
-
-# Call this from authority to inform peers of object ownership
+# Called from the superclass, overridden here to set authority over the object's
+# input controller, so the assigned peer can control it's movement.
 @rpc("authority", "call_local")
 func inform_peers_control_taken(new_player_tagged: String):
 	print("(Auth) Control taken by %s" % new_player_tagged)

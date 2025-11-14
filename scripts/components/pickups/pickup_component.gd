@@ -12,7 +12,7 @@ var pickup_animation = "default"
 func _ready() -> void:
 	if is_multiplayer_authority():
 		area_entered.connect(_picked_up)
-	
+
 # TODO: this may be better done through composition
 # Make sure this is only called on authority, this is where we'll process the collision detection
 func _picked_up(collector: Area2D):
