@@ -1,5 +1,7 @@
 extends Node
 
+# TODO: since this shares logic with side_kick_controller, we could make a common controller script...
+
 var input_dir: Vector2
 
 func _physics_process(delta: float) -> void:

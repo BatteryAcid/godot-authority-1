@@ -1,4 +1,4 @@
-extends PickupAuthComponent
+extends PickupInputAuthComponent
 
 # When the "Side kick" is claimed, use arrow keys to hit the other player.
 # Demonstrates "authority swapping" of the InputController. Inputs are then 
@@ -16,15 +16,13 @@ extends PickupAuthComponent
 @onready var _hitbox_component: HitboxComponent = $HitboxComponent
 @onready var side_kick_input_synchronizer: MultiplayerSynchronizer = $SideKickInputController/SideKickInputSynchronizer
 
-var spent = false # Indicates whether or not the item has been used.
-
 func _ready() -> void:
 	super._ready()
 	_hitbox_component.hit_hurtbox.connect(_hit_hurtbox)
 
 func _physics_process(delta: float) -> void:
 	if get_tree().get_multiplayer().has_multiplayer_peer() and is_multiplayer_authority() \
-		and not MatchManager.game_paused and not player_tagged.tagged_player_name == "" and not spent:
+		and not MatchManager.game_paused and player_tagged.is_player_tagged():
 		
 		var input_dir = input_controller.input_dir
 		var velocity: Vector2 = Vector2(input_dir.x, input_dir.y) * 900
@@ -32,71 +30,47 @@ func _physics_process(delta: float) -> void:
 
 # When mine hit, remove it.
 func _hit_hurtbox(_hurtbox: HurtboxComponent) -> void:
-	#print("Side kick _hit_hurtbox entered") # TODO: remove
-	if spent: return # Prevents multiple "hits"
-	#print("Side kick registered hit") # TODO: remove
-	spent = true
 	pickup_sprite.animation = "explode"
+	
+	set_physics_process(false)
 	
 	# This is an attempt to prevent "Node not found" errors that happen after
 	# the Side Kick is queue_free.
+	# TODO: should this only run on owning-peer?
+	# Like: side_kick_input_synchronizer.get_multiplayer_authority() == multiplayer.get_unique_id()
 	side_kick_input_synchronizer.set_visibility_public(false) 
+	
 
 	if is_multiplayer_authority() and not pickup_sprite.animation_finished.has_connections():
-		# print("Auth: %s On-peer: %s" % [is_multiplayer_authority(), multiplayer.get_unique_id()])
 		pickup_sprite.animation_finished.connect(queue_free)
 
+# TODO: rename time to live?
+# Assume this will always be called from the same authority that owns the MultiplayerSpawner for this item.
+# So the host-authority peer.
 func set_lifetime(seconds: int):
 	print("(Side Kick) Item will last %s seconds!" % seconds)
-	# Auth-host after timeout -> Auth-host kill-sync RPC-> local-peer-input-auth -> local-peer-auth kill visibility RPC-> host-auth queue_free
-	# This works but still needs a fallback incase this back and forth fails. A failsafe timeout
-	get_tree().create_timer(seconds).timeout.connect(kill_sync)
+	# TODO: Auth-host after timeout -> Auth-host kill-sync RPC-> local-peer-input-auth -> local-peer-auth kill visibility RPC-> host-auth queue_free
+	# This works but still needs a fallback incase this back and forth fails. A failsafe timeout...
+	get_tree().create_timer(4).timeout.connect(clean_up)
 
-func kill_sync():
-	# From the auth-host, send rpc to current owner of item, to stop data sync.
-	_kill_sync.rpc_id(str(player_tagged.tagged_player_name).to_int())
+func clean_up():
+	if player_tagged.is_player_tagged():
+		# From the auth-host, send rpc to current owner of item, to stop data sync.
+		_kill_sync.rpc_id(str(player_tagged.tagged_player_name).to_int())
+	else:
+		# If no player is tagged, just despawn, no visibility changes needed.
+		_despawn()
 
-@rpc("authority", "call_remote", "reliable")
+@rpc("authority", "call_local", "reliable")
 func _kill_sync():
-	# On peer that owns item, cancel synching data
+	# On peer with authority over the input, cancel synching data
 	side_kick_input_synchronizer.set_visibility_public(false)
 	# Tell the auth-host to despawn item
 	_despawn.rpc_id(1)
 
 @rpc("any_peer", "call_local", "reliable")
 func _despawn():
-	#side_kick_input_synchronizer.set_visibility_public(false) 
+	# We can get away with using the standard authority check as the owning-peer
+	# will only have authority over inputs, so this check is still valid.
 	if is_multiplayer_authority():
 		queue_free()
-		
-		# IMPORTANT: This is not an exact fix to the "Node not found" error.
-		# Turning off the synchronizer's visibility, along with a pause between
-		# a queue_free call, is a way to reduce the chance of the error, not 
-		# completely prevent it.
-		# Another option, is to set Replicate setting to on_change, which reduces
-		# network traffic that may trigger this error.
-		#side_kick_input_synchronizer.set_visibility_public(false) 
-		#await get_tree().create_timer(1).timeout
-		#queue_free()
-
-# NOTE: Overridden to handle the case where it's picked up but not used,
-# the timeout to queue_free still must be preceded by setting visibility to false.
-# Reduces chance of "Node not found" error, read comments in _despawn below.
-# Only called from authority upon spawn.
-#func set_lifetime(seconds: int):
-	#print("(Side Kick) Item will last %s seconds!" % seconds)
-	#get_tree().create_timer(seconds).timeout.connect(_despawn)
-
-
-# TODO: may need this when we give full control over object
-#func _call_despawn():
-	## Call directly to the server peer, as they have ownership over the spawner.
-	#_despawn.rpc_id(1)
-#
-#@rpc("any_peer", "call_local")
-#func _despawn():
-	#if not is_multiplayer_authority(): return
-	##side_kick_input_synchronizer.set_visibility_public(false) 
-	##side_kick_input_synchronizer.set_visibility_for(0, true)
-	#print("Despawn")
-	#queue_free()

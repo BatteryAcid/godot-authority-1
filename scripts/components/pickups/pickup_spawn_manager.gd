@@ -5,7 +5,7 @@ extends Node
 # you'd want to randomly spawn them from a timer or something.
 
 @onready var _pickup_spawn_path: Node2D = get_tree().current_scene.get_node("%Pickups")
-var _pickup_item_scene_names: Array[String] = ["res://scenes/pickups/mine.tscn", "res://scenes/pickups/side_kick.tscn"]
+var _pickup_item_scene_names: Array[String] = ["res://scenes/pickups/mine.tscn", "res://scenes/pickups/side_kick.tscn", "res://scenes/pickups/drone.tscn"]
 var _pickup_item: PickupComponent = null # Limit to only one active pickup item at a time
 
 func _ready() -> void:
@@ -18,6 +18,8 @@ func _physics_process(_delta: float) -> void:
 			_spawn_pickup_item(0)
 		elif Input.is_action_just_pressed("2"):
 			_spawn_pickup_item(1)
+		elif Input.is_action_just_pressed("3"):
+			_spawn_pickup_item(2)
 
 func _spawn_pickup_item(item_scene_index: int):
 	var pickup_scene = load(_pickup_item_scene_names[item_scene_index])
@@ -33,4 +35,4 @@ func _spawn_pickup_item(item_scene_index: int):
 	
 	# kill after some time
 	# TODO: could move to store this in the item itself
-	_pickup_item.set_lifetime(3)
+	_pickup_item.set_lifetime(4)

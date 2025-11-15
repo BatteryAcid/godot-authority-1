@@ -15,6 +15,7 @@ func _activate_interaction_signals():
 	area_entered.connect(_on_hurtbox_entered)
 
 func _on_hurtbox_entered(hurtbox: Area2D):
+	# Ignore hits to self
 	if player_tagged.tagged_player_name == hurtbox.get_parent().name: return
 
 	if not hurtbox is HurtboxComponent: return

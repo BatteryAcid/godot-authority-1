@@ -24,6 +24,7 @@ shape = SubResource("CircleShape2D_mr1b6")
 script = ExtResource("5_6citd")
 damage = 4
 player_tagged = NodePath("../PlayerTagged")
+activation_delay_seconds = 1
 metadata/_custom_type_script = "uid://s5sn2tc115ng"
 
 [node name="HitboxCollision" type="CollisionShape2D" parent="HitboxComponent"]

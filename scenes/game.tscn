@@ -148,7 +148,7 @@ unique_name_in_owner = true
 script = ExtResource("10_vtaks")
 
 [node name="PickSpawner" type="MultiplayerSpawner" parent="PickupSpawnManager"]
-_spawnable_scenes = PackedStringArray("uid://cdt0a6va201af", "uid://ydkf6xk0dskx")
+_spawnable_scenes = PackedStringArray("uid://cdt0a6va201af", "uid://ydkf6xk0dskx", "uid://d2ap61tnvx0b0")
 spawn_path = NodePath("../../Pickups")
 
 [connection signal="pressed" from="GameMenu/Panel/HBoxContainer/MainMenu" to="." method="_on_main_menu_pressed"]
